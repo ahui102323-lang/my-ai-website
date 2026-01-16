@@ -2,19 +2,19 @@
 
 {% block content %}
 <div class="reflection-container">
-    <header class="page-header">
+    <div class="reflection-header">
         <h2>📘 学习感悟</h2>
-    </header>
+    </div>
 
-    <article class="reflection-article">
+    <div class="reflection-content">
         <div class="article-image">
-            <img src="{{ url_for('static', filename='images/learn.png') }}" alt="学习笔记" class="article-img">
+            <img src="{{ url_for('static', filename='images/learn.png') }}" alt="学习笔记">
         </div>
         <div class="article-text">
-            <h3>提问的艺术</h3>
-            <p>在 AI 时代，我逐渐意识到：问题的质量，决定了学习的高度。</p>
+            <p>在 AI 时代，我逐渐意识到：</p>
+            <p><strong>问题的质量，决定了学习的高度。</strong></p>
             <p>通过与 AI 对话，我学会了拆解问题、不断迭代，也更加坚定了终身学习的信念。</p>
         </div>
-    </article>
+    </div>
 </div>
 {% endblock %}
