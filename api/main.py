@@ -6,8 +6,7 @@ from dotenv import load_dotenv
 # 加载环境变量
 load_dotenv()
 
-# 1. 强制使用 Vercel 最兼容的路径配置
-# 在 Vercel 的 api 运行环境中，使用相对路径 '../' 来定位根目录下的文件夹
+# 1. 路径设置
 app = Flask(__name__, 
             template_folder='../templates', 
             static_folder='../static')
@@ -15,14 +14,14 @@ app = Flask(__name__,
 # 2. 配置 API 密钥
 dashscope.api_key = os.getenv('ALIYUN_API_KEY')
 
-# 3. 简单的路由设置（确保不产生变量冲突）
+# 3. 路由设置
 @app.route('/')
 def home():
     try:
-        # 只要 index.html 存在，这行就能成功
-        return render_template('index.html')
+        # 核心修正：补齐 HTML 模板可能需要的空变量，防止 'undefined' 报错
+        return render_template('index.html', user=None, error=None)
     except Exception as e:
-        return f"模板渲染错误: {str(e)}"
+        return f"模板渲染发生错误: {str(e)}"
 
 @app.route('/reflections')
 def reflections():
@@ -36,12 +35,12 @@ def gallery():
 def chat_page():
     return render_template('chat.html')
 
-# 4. AI 问答接口
 @app.route('/ask', methods=['POST'])
 def ask_ai():
     try:
-        # 即使 AI 还没完全调通，也要确保接口不崩
         user_input = request.json.get("question", "")
-        return jsonify({"answer": f"收到你的消息：{user_input}。目前服务器连接正常！"})
+        # 这里预留了简单的 AI 逻辑
+        answer = f"服务器已收到您的提问：'{user_input}'。目前连接正常！"
+        return jsonify({"answer": answer})
     except Exception as e:
-        return jsonify({"answer": f"接口异常: {str(e)}"})
+        return jsonify({"answer": f"AI服务暂时无法访问: {str(e)}"})
