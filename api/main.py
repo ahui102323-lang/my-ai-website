@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import dashscope
 from dotenv import load_dotenv
 
@@ -11,9 +11,15 @@ app = Flask(__name__,
 
 dashscope.api_key = os.getenv('ALIYUN_API_KEY')
 
-# 定义一个通用的安全渲染函数
+# --- 完美修复：解决日志中的 404 图标报错 ---
+@app.route('/favicon.ico')
+@app.route('/favicon.png')
+def favicon():
+    # 告诉浏览器：如果找不到图标，就去 static/images 目录找，或者干脆忽略
+    return send_from_directory(os.path.join(app.root_path, '../static/images'),
+                               'ai.png', mimetype='image/png')
+
 def safe_render(template_name):
-    # 强制传入 user=None，解决 HTML 里的 {{ user }} 报错问题
     return render_template(template_name, user=None)
 
 @app.route('/')
@@ -36,6 +42,7 @@ def chat_page():
 def ask_ai():
     try:
         user_input = request.json.get("question", "")
-        return jsonify({"answer": f"已收到消息：{user_input}，AI 模块准备就绪！"})
+        # 这里你可以对接真正的 dashscope.Generation.call(...)
+        return jsonify({"answer": f"AI 已就绪！您说的是：{user_input}"})
     except Exception as e:
         return jsonify({"answer": f"错误: {str(e)}"})
