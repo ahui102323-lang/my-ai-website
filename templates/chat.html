@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>💬 智能助手对话</h2>
+    <div id="chat-box" style="background:#f9f9f9; padding:20px; border-radius:10px; min-height:150px; margin-bottom:20px; border:1px solid #eee;">
+        <p id="answer" style="color:#555;">你好！我是 AI 助手，你可以问我关于“科学上网”、“学习收获”或“网页搭建”的问题。</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <input type="text" id="question" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="在此输入问题...">
+        <button onclick="ask()">发送</button>
+    </div>
+</div>
+
+<script>
+function ask() {
+    const q = document.getElementById("question").value;
+    if(!q) return;
+    const ans = document.getElementById("answer");
+    ans.innerHTML = "<i>正在思考中...</i>";
+    
+    fetch("/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({question: q})
+    })
+    .then(res => res.json())
+    .then(data => {
+        ans.innerHTML = "<b>AI 回复：</b><br>" + data.answer;
+    });
+}
+</script>
+{% endblock %}
