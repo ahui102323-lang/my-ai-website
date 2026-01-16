@@ -1,3 +1,0 @@
-flask
-dashscope
-python-dotenv
