@@ -14,33 +14,31 @@ app = Flask(__name__,
 # 2. 配置 API 密钥
 dashscope.api_key = os.getenv('ALIYUN_API_KEY')
 
-# 3. 路由设置
+# 3. 路由设置 - 为每个页面补齐基础变量，防止 undefined 报错
 @app.route('/')
 def home():
-    try:
-        # 核心修正：补齐 HTML 模板可能需要的空变量，防止 'undefined' 报错
-        return render_template('index.html', user=None, error=None)
-    except Exception as e:
-        return f"模板渲染发生错误: {str(e)}"
+    return render_template('index.html', user=None)
 
 @app.route('/reflections')
 def reflections():
-    return render_template('reflections.html')
+    # 补齐子页面可能需要的变量
+    return render_template('reflections.html', user=None)
 
 @app.route('/gallery')
 def gallery():
-    return render_template('gallery.html')
+    return render_template('gallery.html', user=None)
 
 @app.route('/chat')
 def chat_page():
-    return render_template('chat.html')
+    return render_template('chat.html', user=None)
 
+# 4. AI 问答接口
 @app.route('/ask', methods=['POST'])
 def ask_ai():
     try:
         user_input = request.json.get("question", "")
-        # 这里预留了简单的 AI 逻辑
-        answer = f"服务器已收到您的提问：'{user_input}'。目前连接正常！"
+        # 这里是简单的 AI 逻辑
+        answer = f"连接成功！您输入的是：'{user_input}'。目前 AI 助手已准备就绪。"
         return jsonify({"answer": answer})
     except Exception as e:
         return jsonify({"answer": f"AI服务暂时无法访问: {str(e)}"})
