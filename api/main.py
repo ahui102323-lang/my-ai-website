@@ -3,38 +3,33 @@ from flask import Flask, render_template, request, jsonify
 import dashscope
 from dotenv import load_dotenv
 
-# 1. 环境初始化
+# 加载环境变量
 load_dotenv()
 
-# 2. 强力路径定位：无论服务器在哪运行，都强制指向根目录
-# 获取 main.py 所在文件夹 (api)
-current_api_dir = os.path.dirname(os.path.abspath(__file__))
-# 获取根目录 (api 的上一层)
-project_root = os.path.abspath(os.path.join(current_api_dir, '..'))
-
-# 3. 实例化 Flask，明确指定模板和静态文件位置
+# --- 核心改动：使用 Vercel 最兼容的路径写法 ---
+# 在 Vercel 中，api 文件夹内的函数运行时，根目录通常被映射为当前执行环境
 app = Flask(__name__, 
-            template_folder=os.path.join(project_root, 'templates'), 
-            static_folder=os.path.join(project_root, 'static'))
+            template_folder='../templates', 
+            static_folder='../static')
 
-# 4. 配置 API 密钥 (确保 Vercel 环境变量名完全一致)
+# 配置 API 密钥
 dashscope.api_key = os.getenv('ALIYUN_API_KEY')
 
-# 5. 模拟知识库
+# 模拟知识库
 KNOWLEDGE_BASE = {
-    "科学上网": "科学上网是接触全球 AI 资源的门票。通过合法合规的方式访问国际互联网，我们可以使用 ChatGPT, Gemini 等顶级工具。",
-    "学习收获": "通过与 AI 交互，我意识到‘提问’比‘答案’更重要。活到老学到老在 AI 时代变得触手可及。",
-    "网页搭建": "本网页使用 Python 的 Flask 框架搭建，体现了从小白到开发者的跨越。"
+    "科学上网": "科学上网是接触全球 AI 资源的门票。",
+    "学习收获": "我意识到‘提问’比‘答案’更重要。",
+    "网页搭建": "本网页使用 Python 的 Flask 框架搭建。"
 }
-
-# --- 路由设置 ---
 
 @app.route('/')
 def home():
     try:
+        # 如果还是找不到，尝试直接返回 template 名
         return render_template('index.html')
     except Exception as e:
-        return f"错误：找不到 index.html。请确认 templates 文件夹在根目录。报错详情: {str(e)}"
+        # 这里会显示更具体的错误信息，帮我们做最后判断
+        return f"当前运行路径: {os.getcwd()}，错误详情: {str(e)}"
 
 @app.route('/reflections')
 def reflections():
@@ -52,13 +47,11 @@ def chat_page():
 def ask_ai():
     try:
         user_input = request.json.get("question", "")
-        answer = "这是一个好问题！你可以尝试问我：科学上网、学习收获 或 网页搭建。"
+        answer = "你可以尝试问我：科学上网、学习收获 或 网页搭建。"
         for key in KNOWLEDGE_BASE:
             if key in user_input:
                 answer = KNOWLEDGE_BASE[key]
                 break
         return jsonify({"answer": answer})
     except Exception as e:
-        return jsonify({"answer": f"AI 对话服务暂时不可用：{str(e)}"})
-
-# Vercel 部署不需要 app.run()
+        return jsonify({"answer": f"AI服务暂不可用: {str(e)}"})
