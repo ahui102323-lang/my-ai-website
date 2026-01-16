@@ -11,9 +11,7 @@ app = Flask(__name__,
             template_folder='../templates', 
             static_folder='../static')
 
-# --- 核心修正点 ---
-# 这里必须填入你在 Vercel 设置中添加的 Key 名字，即 'ALIYUN_API_KEY'
-# 系统会自动从云端安全地读取那一串 sk-68469663...
+# 配置 API 密钥
 dashscope.api_key = os.getenv('ALIYUN_API_KEY')
 
 # 模拟的 AI 知识库
@@ -39,13 +37,10 @@ def gallery():
 def chat_page():
     return render_template('chat.html')
 
-# AI 问答的后端接口
 @app.route('/ask', methods=['POST'])
 def ask_ai():
     user_input = request.json.get("question", "")
-    
-    # 模拟逻辑
-    answer = "这是一个好问题！关于这个，我的建议是继续保持好奇心。你可以尝试问我：科学上网、学习收获 或 网页搭建。"
+    answer = "这是一个好问题！你可以尝试问我：科学上网、学习收获 或 网页搭建。"
     
     for key in KNOWLEDGE_BASE:
         if key in user_input:
