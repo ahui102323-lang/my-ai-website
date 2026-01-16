@@ -1,32 +1,44 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="card">
-    <h2>💬 智能助手对话</h2>
-    <div id="chat-box" style="background:#f9f9f9; padding:20px; border-radius:10px; min-height:150px; margin-bottom:20px; border:1px solid #eee;">
-        <p id="answer" style="color:#555;">你好！我是 AI 助手，你可以问我关于“科学上网”、“学习收获”或“网页搭建”的问题。</p>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>🤖 AI 智能助手</h2>
+        <p>输入你的问题，探索 AI 的智慧。</p>
     </div>
-    <div style="display:flex; gap:10px;">
-        <input type="text" id="question" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="在此输入问题...">
-        <button onclick="ask()">发送</button>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message ai-message">你好！我是你的 AI 助手，有什么可以帮你的吗？</div>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="输入您的问题...">
+        <button onclick="sendMessage()">发送</button>
     </div>
 </div>
 
 <script>
-function ask() {
-    const q = document.getElementById("question").value;
-    if(!q) return;
-    const ans = document.getElementById("answer");
-    ans.innerHTML = "<i>正在思考中...</i>";
-    
-    fetch("/ask", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({question: q})
-    })
-    .then(res => res.json())
-    .then(data => {
-        ans.innerHTML = "<b>AI 回复：</b><br>" + data.answer;
-    });
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const chatBox = document.getElementById('chatBox');
+    if (!input.value.trim()) return;
+
+    const userText = input.value;
+    chatBox.innerHTML += `<div class="message user-message">${userText}</div>`;
+    input.value = '';
+
+    try {
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: userText })
+        });
+        const data = await response.json();
+        chatBox.innerHTML += `<div class="message ai-message">${data.answer}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (e) {
+        chatBox.innerHTML += `<div class="message ai-message">服务繁忙，请稍后再试。</div>`;
+    }
 }
 </script>
 {% endblock %}
