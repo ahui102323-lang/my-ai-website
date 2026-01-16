@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import dashscope
-from dashscope import Generation
 from dotenv import load_dotenv
 
-# 加载环境变量
 load_dotenv()
 
-# 这里的路径指定非常关键：因为 main.py 在 api 文件夹内，
-# 它需要告诉 Flask 去上一层目录 (..) 寻找 templates 和 static 文件夹
-app = Flask(__name__,
-            template_folder='../templates',
+# 关键修正：显式指定模板和静态文件的路径
+app = Flask(__name__, 
+            template_folder='../templates', 
             static_folder='../static')
 
 # 配置 API 密钥
@@ -58,5 +55,6 @@ def ask_ai():
             break
 
     return jsonify({"answer": answer})
+
 
 # 在 Vercel 环境中，不需要 app.run()，Vercel 会自动处理入口
